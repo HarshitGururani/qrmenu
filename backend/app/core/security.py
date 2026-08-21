@@ -1,3 +1,4 @@
+import hashlib
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from passlib.context import CryptContext
@@ -39,12 +40,12 @@ def decode_access_token(token: str) -> dict:
         raise
 
 
-def refresh_access_token(employee_id: str) -> str:
+def create_refresh__token(employee_id: str) -> str:
     payload = {
         "sub": employee_id,
         "type": "refresh",
         "exp": datetime.now(timezone.utc)
-        + timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_MINUTES),
+        + timedelta(minutes=settings.JWT_REFRESH_TOKEN_EXPIRE_MINUTES),
     }
     return jwt.encode(payload, settings.JWT_REFRESH_SECRET_KEY, algorithm="HS256")
 
@@ -62,6 +63,4 @@ def decode_refresh_token(token: str) -> dict:
 
 
 def hash_token(token: str) -> str:
-    import hashlib
-
     return hashlib.sha256(token.encode()).hexdigest()
