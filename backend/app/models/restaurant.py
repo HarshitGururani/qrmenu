@@ -1,14 +1,18 @@
-from datetime import datetime, timezone
+from datetime import datetime
 import enum
+from typing import TYPE_CHECKING
 import uuid
-from sqlalchemy.orm import Mapped, mapped_column
-from app.core.databse import Base
+from sqlalchemy.orm import Mapped, mapped_column, relationship
+from app.core.database import Base
 from sqlalchemy.dialects.postgresql import UUID
-from sqlalchemy import String, Enum as SAENUM
+from sqlalchemy import String, Enum as SAENUM, func, DateTime
+
+if TYPE_CHECKING:
+    from app.models.restaurant_member import RestaurantMember
 
 
 class PlanEnum(str, enum.Enum):
-    trail = "trail"
+    trial = "trial"
     pro = "pro"
     business = "business"
 
@@ -39,7 +43,7 @@ class Restaurant(Base):
     brand_color: Mapped[str | None] = mapped_column(String(7), nullable=True)
 
     plan: Mapped[PlanEnum] = mapped_column(
-        SAENUM(PlanEnum, name="plan_enum"), nullable=False, default=PlanEnum.trail
+        SAENUM(PlanEnum, name="plan_enum"), nullable=False, default=PlanEnum.trial
     )
 
     billing_cycle: Mapped[BillingCycleEnum] = mapped_column(
@@ -50,10 +54,18 @@ class Restaurant(Base):
 
     is_active: Mapped[bool] = mapped_column(nullable=False, default=True)
     created_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc)
+        DateTime(timezone=True),
+        server_default=func.now(),
+        nullable=False,
     )
 
     updated_at: Mapped[datetime] = mapped_column(
-        default=lambda: datetime.now(timezone.utc),
-        onupdate=lambda: datetime.now(timezone.utc),
+        DateTime(timezone=True),
+        server_default=func.now(),
+        onupdate=func.now(),
+        nullable=False,
+    )
+
+    members: Mapped[list["RestaurantMember"]] = relationship(
+        back_populates="restaurant"
     )
