@@ -9,6 +9,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.core.database import Base
 
 if TYPE_CHECKING:
+    from app.models.account_identity import AccountIdentity
     from app.models.restaurant_member import RestaurantMember
     from app.models.refresh_token import RefreshToken
 
@@ -39,9 +40,9 @@ class Account(Base):
         nullable=True,
     )
 
-    password_hash: Mapped[str] = mapped_column(
+    password_hash: Mapped[str | None] = mapped_column(
         String(255),
-        nullable=False,
+        nullable=True,
     )
 
     is_active: Mapped[bool] = mapped_column(
@@ -69,4 +70,9 @@ class Account(Base):
 
     refresh_tokens: Mapped[list["RefreshToken"]] = relationship(
         back_populates="account"
+    )
+
+    identities: Mapped[list["AccountIdentity"]] = relationship(
+        back_populates="account",
+        cascade="all, delete-orphan",
     )

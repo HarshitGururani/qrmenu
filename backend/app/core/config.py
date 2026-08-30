@@ -10,7 +10,13 @@ class Settings(BaseSettings):
     JWT_SECRET_KEY: str
     JWT_REFRESH_SECRET_KEY: str
     JWT_ACCESS_TOKEN_EXPIRE_MINUTES: int
-    JWT_REFRESH_TOKEN_EXPIRE_MINUTES: int
+    JWT_REFRESH_TOKEN_EXPIRE_DAYS: int
+
+    # Google OAuth
+    GOOGLE_CLIENT_ID: str | None = None
+    GOOGLE_CLIENT_SECRET: str | None = None
+    GOOGLE_REDIRECT_URI: str = "http://localhost:8000/auth/google/callback"
+    FRONTEND_URL: str = "http://localhost:3000"
 
     # Upstash Redis
     UPSTASH_REDIS_REST_URL: str

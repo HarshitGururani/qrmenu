@@ -3,7 +3,7 @@ from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 
-from backend.app.core.config import settings
+from app.core.config import settings
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -16,11 +16,9 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(employee_id: str, role: str, restraunt_id: str) -> str:
+def create_access_token(account_id: str) -> str:
     payload = {
-        "sub": employee_id,
-        "restraunt_id": restraunt_id,
-        "role": role,
+        "sub": account_id,
         "type": "access",
         # 1 hour
         "exp": datetime.now(timezone.utc)
@@ -40,12 +38,12 @@ def decode_access_token(token: str) -> dict:
         raise
 
 
-def create_refresh__token(employee_id: str) -> str:
+def create_refresh_token(account_id: str) -> str:
     payload = {
-        "sub": employee_id,
+        "sub": account_id,
         "type": "refresh",
         "exp": datetime.now(timezone.utc)
-        + timedelta(minutes=settings.JWT_REFRESH_TOKEN_EXPIRE_MINUTES),
+        + timedelta(days=settings.JWT_REFRESH_TOKEN_EXPIRE_DAYS),
     }
     return jwt.encode(payload, settings.JWT_REFRESH_SECRET_KEY, algorithm="HS256")
 
